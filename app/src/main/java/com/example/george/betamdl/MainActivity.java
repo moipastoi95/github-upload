@@ -1,37 +1,23 @@
 package com.example.george.betamdl;
 
 import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.Color;
-import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-
-
-
-    //pour la listView
-    ListView listView ;
-
-
-
 
     /*Variables pour le "Navigation Drawer"*/
     private DrawerLayout mDrawerLayout;
@@ -44,6 +30,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private ListView mListView;
     /*--------------------------------------*/
 
+    // Variables des CardView et de leur contenu
+    private RecyclerView EvtRv;
+    private List<Event> nowEvt;
+    private List<Event> futureEvt;
+    private List<Event> allEvtList;
+    private CardAdapter CardAdapter;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setTitle("Bienvenue");
 
 
-
+        Toast.makeText(MainActivity.this, "Bienvenue ! ",Toast.LENGTH_LONG).show();
 
 
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
@@ -66,21 +60,41 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView = (NavigationView) findViewById(R.id.navigation);
         navigationView.setNavigationItemSelectedListener(this);
 
-        //Listview
-        // Get ListView object from xml
-        listView = (ListView) findViewById(R.id.list);
 
+        /*populateCards();*/
 
+        //https://gist.github.com/gabrielemariotti/4c189fb1124df4556058#file-simpleadapter-java
+        // Pour les évènements actuels
+        int howManyNowEvt = 5;
+        int howManyFutureEvt = 5;
+            //Repérage du RecyclerView
+        EvtRv = (RecyclerView) findViewById(R.id.EvtRv);
 
+            // Génération grace à CardGenerator de :
+        CardGenerator cardGenerator = new CardGenerator();
+                //5 évènements actuels et futurs
+        allEvtList = new ArrayList<>();
+        allEvtList.addAll(cardGenerator.nowEvents(howManyNowEvt));
+        allEvtList.addAll(cardGenerator.futureEvents(howManyFutureEvt));
+        // Création CardAdapter
+        CardAdapter = new CardAdapter(allEvtList);
+        EvtRv.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
 
-        populateList();
+        // Création de la section de la list
+        List<SimpleSectionedRecyclerViewAdapter.Section> sections =
+                new ArrayList<SimpleSectionedRecyclerViewAdapter.Section>();
 
-        Snackbar.make(findViewById(android.R.id.content), "Bonjour ! ", Snackbar.LENGTH_LONG)
-                .setActionTextColor(Color.RED)
-                .show();
+        //Configurer les sections
+        sections.add(new SimpleSectionedRecyclerViewAdapter.Section(0,"Evenements Actuels"));
+        sections.add(new SimpleSectionedRecyclerViewAdapter.Section(howManyNowEvt,"Evenements futurs"));
 
+        //ajouter l'adapter à sectionAdapter
+        SimpleSectionedRecyclerViewAdapter.Section[] dummy = new SimpleSectionedRecyclerViewAdapter.Section[sections.size()];
+        SimpleSectionedRecyclerViewAdapter mSectionedAdapter = new
+                SimpleSectionedRecyclerViewAdapter(this,R.layout.section,R.id.section_text,CardAdapter);
+        mSectionedAdapter.setSections(sections.toArray(dummy));
 
-
+        EvtRv.setAdapter(mSectionedAdapter);
     }
 
     @Override
@@ -114,23 +128,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-    private void populateList(){
-        // Defined Array values to show in ListView
-        String[] values = new String[] { "Android List View",
-                "Adapter implementation",
-                "Simple List View In Android",
-                "Create List View Android",
-                "Android Example",
-                "List View Source Code",
-                "List View Array Adapter",
-                "Android Example List View"
-        };
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, android.R.id.text1, values);
-
-        // Assign adapter to ListView
-        listView.setAdapter(adapter);
+    private void populateCards(){
 
 
     }
