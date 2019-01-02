@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView.setNavigationItemSelectedListener(this);
 
 
+
         /*populateCards();*/
 
         //https://gist.github.com/gabrielemariotti/4c189fb1124df4556058#file-simpleadapter-java
@@ -95,6 +96,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mSectionedAdapter.setSections(sections.toArray(dummy));
 
         EvtRv.setAdapter(mSectionedAdapter);
+
+
+
+        // TEST pour les dates
+
     }
 
     @Override
